@@ -69,7 +69,7 @@ func systemd() {
 
 	unit := "vpnSwitcher"
 	path := "/etc/systemd/system/" + unit + ".service"
-	if _, err := os.Stat(path); os.IsExist(err) {
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		return
 	}
 
