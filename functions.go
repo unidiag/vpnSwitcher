@@ -65,6 +65,7 @@ func getRemoteHost(filePath string) (string, error) {
 	return "", fmt.Errorf("remote host not found!")
 }
 
+// check systemd unit
 func systemd() {
 
 	unit := "vpnSwitcher"
