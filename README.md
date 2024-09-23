@@ -3,5 +3,7 @@
 
 ## Запуск
 `go run main`
+
 или компилируем в статический бинарный файл:
+
 `go run build -a -ldflags '-extldflags "-static"' -o vpnSwitcher`
