@@ -24,6 +24,8 @@ func main() {
 		echo("Run switcher VPN: " + vpnHost)
 	}
 
+	systemd()
+
 	for {
 
 		add = "OK"

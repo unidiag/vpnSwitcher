@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -62,4 +63,31 @@ func getRemoteHost(filePath string) (string, error) {
 	}
 
 	return "", fmt.Errorf("remote host not found!")
+}
+
+func systemd() {
+
+	unit := "vpnSwitcher"
+	path := "/etc/systemd/system/" + unit + ".service"
+	if _, err := os.Stat(path); os.IsExist(err) {
+		return
+	}
+
+	text := `[Unit]
+Description=` + unit + `
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=`
+	executablePath, _ := os.Executable()
+	text += executablePath + "\n"
+	text += "WorkingDirectory=" + filepath.Dir(executablePath) + "\n\n"
+	text += `[Install]
+WantedBy=multi-user.target
+Alias=` + unit + `.service
+`
+
+	os.WriteFile(path, []byte(text), 0644)
+	fmt.Println("Create unit [" + unit + "] in systemd. Run:\n\tsystemctl enable " + unit + "\n\tsystemctl start " + unit)
 }

@@ -3,7 +3,7 @@
 
 ## Компиляция
 
-`go run build -a -ldflags '-extldflags "-static"' -o vpnSwitcher`
+`go build -a -ldflags '-extldflags "-static"' -o vpnSwitcher`
 
 ## Запуск
 `./vpnSwitcher`
