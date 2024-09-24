@@ -10,7 +10,7 @@ const (
 	chatID     = "XXXXXXXXX"                                      // recepient
 	sendPeriod = 3600
 	tempMin    = -10.0
-	tempMax    = 20.0
+	tempMax    = 70.0
 )
 
 type SendMessageRequest struct {
