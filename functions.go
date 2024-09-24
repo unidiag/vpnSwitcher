@@ -2,14 +2,81 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
+
+func getLoadAverage() string {
+	data, err := os.ReadFile("/proc/loadavg")
+	if err != nil {
+		return "unknown"
+	}
+	return strings.TrimSpace(string(data))
+}
+
+func toStr(value interface{}) string {
+	switch v := value.(type) {
+	case int:
+		return strconv.Itoa(v)
+	case float64:
+		return strconv.FormatFloat(v, 'f', -1, 64)
+	case bool:
+		return strconv.FormatBool(v)
+	case string:
+		return v
+	case []byte:
+		//return hex.EncodeToString(v)
+		return string(v)
+	default:
+		return fmt.Sprintf("%v", value)
+	}
+}
+
+func getCPUTemperature() float64 {
+	thermalZonePath := "/sys/class/thermal/thermal_zone0/temp"
+	data, err := os.ReadFile(thermalZonePath)
+	if err != nil {
+		return 0
+	}
+	tempStr := strings.TrimSpace(string(data))
+	tempMilli, err := strconv.Atoi(tempStr)
+	if err != nil {
+		return 0
+	}
+	return float64(tempMilli) / 1000.0
+}
+
+func msg2tlg(message string) {
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
+
+	// Создаем данные для запроса
+	reqBody := &SendMessageRequest{
+		ChatID: chatID,
+		Text:   message,
+	}
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return
+	}
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		echo(message)
+	}
+}
 
 func checkHost(host string) bool {
 	_, err := net.DialTimeout("tcp", host+":80", 2*time.Second)
